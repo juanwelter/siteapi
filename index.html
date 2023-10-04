@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="site de pokemon, pokemonapi, pokeapi, pokemon, pokebola, pikachu, bulbasaur, pokemon 2023"/>
+    <meta name="author" content="Tales Rizzi"/>
+    <meta name="description" content="Site com o tema pokemon, onde quando clicado na pokebola, aparece um pokemon e suas informações, utilizando a pokeApi"/>
+    <title>Conselhos Sábios</title>
+</head>
+<body>
+    <header>
+        <h1>Conselhos Sábios</h1>
+    </header>
+    
+    <div class="container">
+        <h2>Conselho do Dia:</h2>
+        <p class="advice" id="adviceText"></p>
+        <button onclick="getRandomAdvice()">Obter Conselho Aleatório</button>
+
+        <h2>Pesquisar Conselho:</h2>
+        <input type="text" id="searchInput" placeholder="Digite sua pesquisa">
+        <button onclick="searchAdvice()">Pesquisar</button>
+
+        <h2>Conselhos Recentes:</h2>
+        <ul id="recentAdviceList">
+            <!-- Os conselhos pesquisados serão exibidos aqui -->
+        </ul>
+    </div>
+
+    <script>
+        function getRandomAdvice() {
+            fetch('https://api.adviceslip.com/advice')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('adviceText').textContent = data.slip.advice;
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar conselho aleatório:', error);
+                });
+        }
+
+        function searchAdvice() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                fetch(`https://api.adviceslip.com/advice/search/${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const recentAdviceList = document.getElementById('recentAdviceList');
+                        recentAdviceList.innerHTML = '';
+
+                        if (data.slips && data.slips.length > 0) {
+                            data.slips.forEach(slip => {
+                                const li = document.createElement('li');
+                                li.textContent = slip.advice;
+                                recentAdviceList.appendChild(li);
+                            });
+                            document.getElementById('adviceText').textContent = 'Resultados da pesquisa:';
+                        } else {
+                            document.getElementById('adviceText').textContent = 'Nenhum conselho encontrado.';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar conselho:', error);
+                    });
+            }
+        }
+
+        getRandomAdvice();
+    </script>
+</body>
+</html>
